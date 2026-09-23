@@ -2,6 +2,7 @@ import { runEventChallenge } from "@/application/run-event-challenge";
 import { EventChallengeValidationError } from "@/domain/events";
 import { ScenarioValidationError, type ScenarioErrorCode } from "@/domain/model";
 import { challengeSchema } from "@/infrastructure/http/challenge-schema";
+import { CaseHttpError, readBoundedText } from "@/infrastructure/cases/http";
 
 const scenarioValidationMessages: Record<ScenarioErrorCode, string> = {
   VERSION_MISMATCH: "Версии данных или правил устарели. Обновите страницу.",
@@ -16,8 +17,11 @@ export async function POST(request: Request): Promise<Response> {
   let body: unknown;
 
   try {
-    body = await request.json();
+    body = JSON.parse(await readBoundedText(request.body, 32768, 5000));
   } catch (error) {
+    if (error instanceof CaseHttpError) {
+      return Response.json({ error: error.message }, { status: error.status });
+    }
     if (error instanceof SyntaxError) {
       return Response.json({ error: "Тело запроса должно содержать корректный JSON." }, { status: 400 });
     }
@@ -31,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const result = runEventChallenge(parsed.data);
-    return Response.json({ result });
+    return Response.json({ result }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof ScenarioValidationError) {
       return Response.json({ error: scenarioValidationMessages[error.code] }, { status: 400 });

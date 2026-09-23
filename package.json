@@ -12,24 +12,30 @@
     "lint": "eslint .",
     "check:k8s": "bash scripts/validate-k8s.sh",
     "smoke:deploy": "node scripts/deploy-smoke.mjs",
-    "test": "tsx --test src/components/simulation/challenge-state.test.ts src/data/city-v1.test.ts src/domain/evaluate-scenario.test.ts src/domain/run-event-challenge.test.ts src/app/api/scenario/route.test.ts src/app/api/challenge/route.test.ts src/infrastructure/nvidia-scenario-narrator.test.ts"
+    "test": "node scripts/test.mjs",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide-react": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "zod": "latest"
+    "lucide-react": "1.47.0",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "0.186.0",
+    "zod": "4.6.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "latest",
-    "tailwindcss": "latest",
-    "tsx": "^4.23.15",
-    "typescript": "^6.0.3"
-  }
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.186.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3"
+  },
+  "packageManager": "pnpm@10.34.5"
 }

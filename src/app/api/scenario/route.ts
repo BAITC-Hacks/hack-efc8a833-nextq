@@ -3,6 +3,8 @@ import { narrateScenario } from "@/application/scenario-narrator";
 import { ScenarioValidationError, type ScenarioErrorCode } from "@/domain/model";
 import { scenarioSchema } from "@/infrastructure/http/scenario-schema";
 import { NvidiaScenarioNarrator } from "@/infrastructure/nvidia-scenario-narrator";
+import { CaseHttpError, readBoundedText } from "@/infrastructure/cases/http";
+import { caseAiLimiter } from "@/infrastructure/cases/limiter";
 
 const validationMessages: Record<ScenarioErrorCode, string> = {
   VERSION_MISMATCH: "Версии данных или правил устарели. Обновите страницу.",
@@ -17,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     let body: unknown;
     try {
-      body = await request.json();
+      body = JSON.parse(await readBoundedText(request.body, 32768, 5000));
     } catch (error) {
       if (error instanceof SyntaxError) {
         return Response.json({ error: "Тело запроса должно содержать корректный JSON." }, { status: 400 });
@@ -35,9 +37,16 @@ export async function POST(request: Request): Promise<Response> {
       apiKey: process.env.NVIDIA_API_KEY,
       model: process.env.NVIDIA_MODEL,
     });
-    const narration = await narrateScenario(result, narrator);
-    return Response.json({ result, narration });
+    const narration = await narrateScenario(result, {
+      explain: (value) => process.env.NVIDIA_API_KEY?.trim()
+        ? caseAiLimiter.run(() => narrator.explain(value))
+        : narrator.explain(value),
+    });
+    return Response.json({ result, narration }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
+    if (error instanceof CaseHttpError) {
+      return Response.json({ error: error.message }, { status: error.status });
+    }
     if (error instanceof ScenarioValidationError) {
       return Response.json({ error: validationMessages[error.code] }, { status: 400 });
     }

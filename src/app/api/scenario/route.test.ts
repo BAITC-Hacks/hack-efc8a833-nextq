@@ -122,8 +122,13 @@ test("POST rejects every domain validation failure", async () => {
 
 test("POST hides unexpected exception details", async () => {
   const incoming = request(scenario());
-  incoming.json = async () => { throw new Error("private-key-secret"); };
+  Object.defineProperty(incoming, "body", { get() { throw new Error("private-key-secret"); } });
   const response = await POST(incoming);
   assert.equal(response.status, 500);
   assert.deepEqual(await response.json(), { error: "Не удалось рассчитать сценарий. Повторите попытку позже." });
+});
+
+test("POST bounds the legacy request body", async () => {
+  const response = await POST(request({ payload: "x".repeat(32769) }));
+  assert.equal(response.status, 413);
 });
