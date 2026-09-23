@@ -1,0 +1,33 @@
+{
+  "name": "akim-na-5-chasov",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "tsx --test src/domain/evaluate-scenario.test.ts src/app/api/scenario/route.test.ts src/infrastructure/nvidia-scenario-narrator.test.ts"
+  },
+  "dependencies": {
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "latest",
+    "tailwindcss": "latest",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3"
+  }
+}
