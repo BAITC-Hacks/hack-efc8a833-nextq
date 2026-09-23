@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "tsx --test src/domain/evaluate-scenario.test.ts"
   },
   "dependencies": {
     "lucide-react": "latest",
@@ -26,6 +27,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "latest",
     "tailwindcss": "latest",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   }
 }

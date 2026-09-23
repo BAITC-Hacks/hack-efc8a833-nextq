@@ -6,3 +6,4 @@ node_modules/
 .superpowers/sdd/
 coverage/
 dist/
+*.tsbuildinfo
