@@ -1,0 +1,287 @@
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 76px;
+  border-bottom: 1px solid var(--line);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--teal);
+  font-weight: 600;
+  text-underline-offset: 4px;
+}
+
+.explanation {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 28px 0;
+  margin: 0;
+  list-style: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.steps li {
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--line);
+}
+
+.steps li[aria-current="step"] {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.events {
+  margin: 0 0 24px;
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.events legend,
+.districtEffects h3 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.events > p,
+.districtEffects > p {
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.eventGrid,
+.scoreGrid,
+.deltas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.eventCard {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  cursor: pointer;
+}
+
+.eventCard:has(input:checked) {
+  border-color: var(--teal);
+  background: var(--teal-light);
+}
+
+.eventCard:has(input:focus-visible) {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+.eventCard input {
+  flex-shrink: 0;
+  align-self: start;
+  margin-top: 4px;
+  accent-color: var(--teal);
+}
+
+.eventCard > span {
+  display: grid;
+  gap: 10px;
+  line-height: 1.6;
+}
+
+.eventCard small {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.planNote {
+  padding: 20px 24px;
+  margin: 20px 0;
+  background: var(--teal-light);
+  border-left: 3px solid var(--teal);
+  line-height: 1.7;
+}
+
+.planNote p {
+  margin: 8px 0 0;
+}
+
+.originalPlan {
+  margin: 24px 0;
+  line-height: 1.8;
+}
+
+.originalPlan summary {
+  color: var(--teal);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.originalPlan ul {
+  padding-left: 20px;
+}
+
+.returnAction {
+  margin: 8px 0 28px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.report {
+  border-top: 1px solid var(--line);
+  padding: 40px 0;
+}
+
+.report h2 {
+  margin: 12px 0;
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.report > p {
+  line-height: 1.7;
+}
+
+.scoreGrid {
+  margin: 28px 0;
+}
+
+.scoreCard {
+  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.scoreCard:last-child {
+  border-color: var(--teal);
+}
+
+.scoreCard h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.scoreCard p {
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.score {
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(30px, 4vw, 48px);
+  font-weight: 400;
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+}
+
+.score small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 12px;
+}
+
+.deltas {
+  margin: 28px 0;
+}
+
+.deltas dt {
+  color: var(--ink-soft);
+}
+
+.deltas dd {
+  margin: 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.deltas small {
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.districtEffects {
+  margin-top: 36px;
+}
+
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin: 18px 0;
+}
+
+.tableScroll table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.tableScroll caption {
+  text-align: left;
+  padding: 16px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  min-width: 100px;
+}
+
+.tableScroll thead,
+.tableScroll th[scope="row"] {
+  background: var(--white);
+}
+
+.tableScroll:focus-visible,
+.originalPlan summary:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .eventGrid,
+  .scoreGrid,
+  .deltas {
+    grid-template-columns: 1fr;
+  }
+
+  .navigation {
+    flex-wrap: wrap;
+    padding: 18px 0;
+  }
+
+  .steps {
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .returnAction {
+    align-items: start;
+    flex-direction: column;
+    gap: 0;
+  }
+}
