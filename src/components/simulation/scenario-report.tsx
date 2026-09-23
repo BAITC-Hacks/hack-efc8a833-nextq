@@ -1,5 +1,6 @@
 import { directions, type ScenarioResult } from "@/domain/model";
 import { directionNames, formatDelta, formatScore } from "./presentation";
+import { DistrictScoreBars } from "./district-score-bars";
 
 export type Narration =
   | { status: "ready"; content: { summary: string; strengths: string[]; risks: string[]; tradeoffs: string[] } }
@@ -15,6 +16,7 @@ export function ScenarioReport({ result, narration }: ScenarioResponse) {
         <div className="score-card"><span className="panel-kicker">ASTANA QUALITY OF LIFE SCORE</span><strong>{formatScore(result.finalAqol)}<small> / 100</small></strong><p>Было {formatScore(result.baselineAqol)} <span className={result.finalAqol < result.baselineAqol ? "negative-effect" : "positive-effect"}>({formatDelta(result.finalAqol - result.baselineAqol)})</span></p></div>
         <div className="report-budget"><span>Распределено<strong>{result.spent} ед.</strong></span><span>Остаток<strong>{result.remaining} ед.</strong></span><p>AQoL учитывает средние показатели жителей и положение самого слабого района.</p></div>
       </div>
+      <DistrictScoreBars result={result} />
       <div className="table-scroll" role="region" aria-label="Изменения показателей районов" tabIndex={0}>
         <table className="impact-table"><caption>Показатели районов: было → стало. Шкала от 0 до 100.</caption><thead><tr><th scope="col">Район</th>{directions.map((direction) => <th scope="col" key={direction}>{directionNames[direction]}</th>)}<th scope="col">Качество среды</th></tr></thead><tbody>
           {result.districts.map((district) => <tr key={district.districtId}><th scope="row">{district.districtName}</th>{directions.map((direction) => <td key={direction}><span>{formatScore(district.baseline[direction])} → {formatScore(district.final[direction])}</span><small className={district.realizedDelta[direction] < 0 ? "negative-effect" : "positive-effect"}>{formatDelta(district.realizedDelta[direction])}</small></td>)}<td><strong>{formatScore(district.quality)}</strong></td></tr>)}
