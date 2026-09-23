@@ -24,3 +24,36 @@ jobs:
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm build
+
+  delivery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: false
+      - run: bash scripts/validate-k8s.sh
+      - run: docker build -t akim-city:ci .
+      - name: Run production container
+        run: |
+          docker run -d --name akim-ci -p 3000:3000 --read-only --tmpfs /tmp --tmpfs /app/.next/cache:uid=1000,gid=1000 --cap-drop ALL --security-opt no-new-privileges akim-city:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/api/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs akim-ci
+          exit 1
+      - run: node scripts/deploy-smoke.mjs
+      - name: Container logs
+        if: failure()
+        run: docker logs akim-ci
+      - name: Remove container
+        if: always()
+        run: docker rm -f akim-ci || true

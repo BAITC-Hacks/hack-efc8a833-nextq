@@ -28,6 +28,28 @@ pnpm start
 pnpm test
 ```
 
+## Docker и Kubernetes
+
+Production-образ использует Next.js standalone, работает от непривилегированного пользователя и слушает порт `3000`. Проверка готовности: `GET /api/health`. Ключ AI передаётся при запуске контейнера.
+
+```sh
+docker build -t akim-city:local .
+docker run --rm --name akim -p 3000:3000 akim-city:local
+```
+
+В другом терминале выполните `pnpm smoke:deploy`: проверяются health, страница, статический файл и контрольный расчёт `/api/challenge`. Для AI добавьте `--env-file .env.local` перед именем образа.
+
+Для локального Kubernetes с доступом к образу `akim-city:local`:
+
+```sh
+pnpm check:k8s
+kubectl apply -k deploy/k8s
+kubectl -n akim rollout status deployment/akim --timeout=180s
+kubectl -n akim port-forward service/akim 3000:80
+```
+
+Проверка манифестов требует `kubectl`, Go 1.24+ и сеть для kubeconform и схем. Для удалённого кластера требуется загрузить образ в registry и указать его адрес. Контракт образа, Secret, настройка registry и остановка описаны в [`docs/runtime-contract.md`](docs/runtime-contract.md). CI проверяет схемы Kubernetes и запускает тот же smoke в собранном Docker-образе.
+
 ## Модель города
 
 Каталог `src/data/city-v1.ts` содержит шесть вымышленных районов, 15 мероприятий и одну синергию: парк и освещение в одном районе дополнительно повышают безопасность на 2 пункта. Версии набора и правил — `city-1` и `rules-1`; общий бюджет — 100 условных единиц. Население задано в тысячах. Все показатели используют шкалу 0–100, где больше означает лучше.
