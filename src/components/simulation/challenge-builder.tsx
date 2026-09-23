@@ -68,7 +68,7 @@ export function ChallengeBuilder({ city, catalog }: { city: CityDataset; catalog
   return (
     <main className="command-page">
       <header className={styles.navigation}>
-        <Link href="/" className="brand"><span className="brand-mark"><MapPinned size={19} aria-hidden="true" /></span><span className="brand-copy"><strong>ҚАЛА / CITY LAB</strong><small>ЛАБОРАТОРИЯ УСТОЙЧИВОСТИ</small></span></Link>
+        <Link href="/" className="brand"><span className="brand-mark"><MapPinned size={19} aria-hidden="true" /></span><span className="brand-copy"><strong>ҚАЛА / QALA LAB</strong><small>ЛАБОРАТОРИЯ УСТОЙЧИВОСТИ</small></span></Link>
         <Link href="/" className={styles.backLink}><ArrowLeft size={16} aria-hidden="true" /> Обычный сценарий</Link>
       </header>
       <section className="briefing">

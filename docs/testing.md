@@ -31,7 +31,7 @@ pnpm exec tsx --test src/data/city-v1.test.ts
 
 Workflow `.github/workflows/verify.yml` запускает установку по lockfile, все тесты, ESLint, production-сборку и Chromium E2E на Node.js 22 при push и pull request. Отдельная задача проверяет Kubernetes и настоящий Docker runtime.
 
-## City Lab
+## Qala Lab
 
 `pnpm test` рекурсивно находит `src/**/*.test.ts` и `src/**/*.test.tsx`; новые тесты не требуют ручного перечисления. Проверяются четыре кейса, бюджет 100, ровно 5мер, максимум 2одногонаправления, несовместимости, лаги и отрицательные эффекты, синергии, порог40, пересчитанные рекомендации, HTTP-схемы, подписи AI-кейсов и провайдеры с подменённым HTTP.
 

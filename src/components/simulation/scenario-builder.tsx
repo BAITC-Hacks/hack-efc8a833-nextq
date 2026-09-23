@@ -75,12 +75,12 @@ export function ScenarioBuilder({ city }: { city: CityDataset }) {
   return (
     <main className="command-page">
       <header className="topbar">
-        <a className="brand" href="#overview" aria-label="Аким на 5 часов, на главную"><span className="brand-mark"><MapPinned size={19} strokeWidth={1.8} aria-hidden="true" /></span><span className="brand-copy"><strong>ҚАЛА / CITY LAB</strong><small>СИМУЛЯТОР УПРАВЛЕНИЯ</small></span></a>
+        <a className="brand" href="#overview" aria-label="Аким на 5 часов, на главную"><span className="brand-mark"><MapPinned size={19} strokeWidth={1.8} aria-hidden="true" /></span><span className="brand-copy"><strong>ҚАЛА / QALA LAB</strong><small>СИМУЛЯТОР УПРАВЛЕНИЯ</small></span></a>
         <div className="topbar-center"><span className="live-dot" /> УЧЕБНЫЙ СЦЕНАРИЙ <span className="topbar-separator">/</span> СЕССИЯ 001</div>
         <span className="language-button" aria-label="Язык интерфейса: русский">RU</span>
       </header>
       <section className="briefing" id="overview">
-        <div className="briefing-copy"><div className="eyebrow"><span>ASTANA / CITY LAB</span><span className="eyebrow-line" /><span>АКИМ НА 5 ЧАСОВ</span></div><h1>Город — это<br /><em>сумма решений.</em></h1><p>Пять направлений. Один общий бюджет. Выберите район и мероприятие для каждого направления, затем оцените последствия.</p><div className="briefing-meta"><span><Clock3 size={15} aria-hidden="true" /> 5 ЭТАПОВ</span><span><MapPinned size={15} aria-hidden="true" /> {city.districts.length} РАЙОНОВ</span></div></div>
+        <div className="briefing-copy"><div className="eyebrow"><span>ASTANA / QALA LAB</span><span className="eyebrow-line" /><span>АКИМ НА 5 ЧАСОВ</span></div><h1>Город — это<br /><em>сумма решений.</em></h1><p>Пять направлений. Один общий бюджет. Выберите район и мероприятие для каждого направления, затем оцените последствия.</p><div className="briefing-meta"><span><Clock3 size={15} aria-hidden="true" /> 5 ЭТАПОВ</span><span><MapPinned size={15} aria-hidden="true" /> {city.districts.length} РАЙОНОВ</span></div></div>
         <BudgetMeter budget={city.budget} spent={spent} />
       </section>
       <nav className="challenge-entry" aria-label="Режим симуляции"><div><strong>Лаборатория устойчивости</strong><p>Городское событие, перераспределение бюджета и три состояния AQoL.</p></div><Link href="/challenge">Проверить план на устойчивость <ArrowRight size={17} aria-hidden="true" /></Link></nav>

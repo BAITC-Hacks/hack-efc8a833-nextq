@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Аким на 5 часов — городской штаб",
+  title: "Qala Lab — Аким на 5 часов",
   description: "Симулятор решений по развитию города с ограниченным бюджетом.",
 };
 
