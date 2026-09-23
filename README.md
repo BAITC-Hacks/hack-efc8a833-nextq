@@ -22,7 +22,7 @@ pnpm build
 pnpm start
 ```
 
-Тесты доменной модели:
+Тесты доменной модели и HTTP-границы:
 
 ```sh
 pnpm test
@@ -49,6 +49,18 @@ pnpm test
 
 Проверяются контрольные сценарии, точный лимит бюджета, синергия только в одном районе, оба ограничения шкалы, порядок суммирования, вес населения, слабейший район, неизменность входов и некорректные решения.
 
+## API сценария
+
+`POST /api/scenario` принимает JSON с `datasetVersion`, `rulesVersion` и массивом из пяти решений. Каждое решение содержит только `direction`, `initiativeId`, `districtId`. Лишние поля, включая клиентскую стоимость, эффекты и score, отклоняются. Пример бесплатного сценария:
+
+```sh
+curl http://localhost:3000/api/scenario \
+  -H 'Content-Type: application/json' \
+  -d '{"datasetVersion":"city-1","rulesVersion":"rules-1","decisions":[{"direction":"transport","initiativeId":"keep-transport","districtId":"orken"},{"direction":"green","initiativeId":"keep-green","districtId":"orken"},{"direction":"social","initiativeId":"keep-social","districtId":"orken"},{"direction":"safety","initiativeId":"keep-safety","districtId":"orken"},{"direction":"services","initiativeId":"keep-services","districtId":"orken"}]}'
+```
+
+Успех: `200` с `{ "result": ... }`, включая расход `0` и AQoL `50`. Некорректный JSON, устаревшие версии, неправильные решения или превышение бюджета: `400` с `{ "error": "..." }`. Неожиданная серверная ошибка: `500` с общим сообщением без внутренних деталей. Zod проверяет форму запроса, домен — правила симуляции; каталог и формула остаются серверным источником расчёта.
+
 ## Статус
 
-Проект реализуется спринтами. Актуальная спецификация и план первого спринта находятся в `docs/design/` и `docs/superpowers/plans/`.
+Проект реализуется спринтами. Спецификация находится в `docs/design/`, пошаговый план первого спринта — в `docs/superpowers/plans/`, параллельные дорожки команды — в [`docs/sprint-workstreams.md`](docs/sprint-workstreams.md).
