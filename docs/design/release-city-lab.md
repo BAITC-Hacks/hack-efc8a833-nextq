@@ -1,44 +1,43 @@
-# Релиз City Lab — контракт реализации
+# Релиз City Lab
 
-## Цель
+Основной источник правил — [датасет пользователя astana-1](astana-dataset.md). Он заменил предварительную схему с шестью условными районами и OPEX до её выпуска. В main выпускается модель с пятью районами, десятью индикаторами, 14 мерами и горизонтом восемь кварталов.
 
-Играбельный симулятор с четырьмя подготовленными кейсами, безопасной AI-генерацией, экономическими компромиссами и визуальным сравнением. Районы и коэффициенты синтетические; проект не выдаёт учебную модель за эмпирический прогноз Астаны.
+## Границы компонентов
 
-## Модель и границы
+- `src/domain/city-case.ts` — контракт, независимый от React/HTTP/AI.
+- `src/data/astana-catalog.ts` — исходные районы, веса, доверенные меры.
+- `src/data/city-cases.ts` — основной набор, учебные вариации, восстановление AI-blueprint.
+- `src/domain/evaluate-city-case.ts` — валидация, лаги, синергии, Score, критические значения и проверенные замены решений.
+- `src/infrastructure/cases` — строгие HTTP-схемы, ограниченное чтение, NVIDIA/OpenAI, HMAC-подпись и ограничение AI-вызовов.
+- `src/app/api/cases` — транспорт; `/sandbox` и `/challenge` сохраняют отдельную прежнюю модель.
+- `src/components/city-lab` — каталог, пять решений, отчёт, сохранение/сравнение и визуализация.
 
-- Публичные типы закреплены в `src/domain/city-case.ts`.
-- Каждый кейс: шесть известных районов, пять направлений, общий инвестиционный бюджет 100. Годовой лимит содержания 15 единиц. Цены и правила заданы серверным каталогом.
-- `src/data/city-cases.ts` экспортирует `cityCases: CityCase[]` и `createCityCase(blueprint: CaseBlueprint, id: string, source: "curated" | "ai"): CityCase`.
-- `src/domain/evaluate-city-case.ts` экспортирует `evaluateCityCase(cityCase: CityCase, input: CaseEvaluationInput): CaseEvaluation`.
-- Горизонты 3/12/36 месяцев: положительные эффекты реализуются постепенно по сроку инициативы, отрицательные учитываются сразу. Синергия не опережает готовность обеих инициатив. Содержание проверяется независимо от CAPEX; lifecycleCost — CAPEX плюс годовое содержание пропорционально горизонту, это консервативный резерв, а не прогноз платежей.
-- Чувствительность: низкий/центральный/высокий эффект по прозрачным множителям; это не статистический доверительный интервал. Рекомендации: до трёх реально пересчитанных улучшений заменой одного решения с соблюдением обоих бюджетов.
-- AI генерирует `CaseBlueprint`, а не формулу и не цены. Только известные районные ID, ограниченные показатели и население. Сервер повторно валидирует и подписывает blueprint; произвольный клиентский каталог не принимается.
+## HTTP
 
-## HTTP-контракт
+| Метод | Путь | Вход | Успех |
+| --- | --- | --- | --- |
+| GET | `/api/cases` | — | `{cases,generation:{available,provider}}` |
+| POST | `/api/cases/generate` | `{brief,theme?}` | `{case,token,provider,model}` |
+| POST | `/api/cases/evaluate` | `{caseId,caseToken?,decisions:[{measureId,districtId?}]}` | `{evaluation}` |
+| POST | `/api/cases/analyze` | Тот же ввод | `{narration:{status:"ready",content:{summary,strengths,risks,tradeoffs}}}` |
 
-- `GET /api/cases`: `{ cases: CityCase[], generation: { available: boolean, provider: string | null } }`.
-- `POST /api/cases/generate`: `{ brief: string, theme?: CaseTheme }` → `{ case: CityCase, token: string, provider: string, model: string }`. Ошибка → `{ error: string, code?: string }` с соответствующим HTTP status. Без ключа — понятная недоступность, без поддельной AI-генерации.
-- `POST /api/cases/evaluate`: `{ caseId: string, caseToken?: string, decisions: Decision[], horizonMonths: 3 | 12 | 36 }` → `{ evaluation: CaseEvaluation }`.
-- `POST /api/cases/analyze`: тот же запрос → `{ narration: { status: "ready", content: { summary, strengths, risks, tradeoffs } } | { status: "unavailable", reason: string } }`. Сервер заново вычисляет результат; клиентские score не принимает.
-- Генерация и анализ: NVIDIA/OpenAI из серверных env; размер запросов ограничен, AI-вызовы ограничены по частоте и времени. Подпись с `CASE_SIGNING_SECRET`; в production генерация без настроенного секрета недоступна.
+AI-недоступность возвращается явно, без поддельного ответа. Некорректный набор не получает score. Клиент не передаёт цены, лаги, формулу или результат. Генерация принимает 20–2000 символов; тело JSON ≤32 KiB, чтение ≤5 секунд. Провайдер ≤30 секунд, ответ ≤96 KiB. Общий process-local лимит AI: 12 запросов/минуту, 2 одновременно. HTTP429 содержит Retry-After.
 
-## Интерфейс
+AI-blueprint имеет пять известных районных ID, все 10 индексов 0..100 и положительные доли населения с суммой 1 (допуск 1e-6). Сервер восстанавливает 14 мер, бюджет 100, горизонт 8 и фиксированные правила. HMAC SHA256 токен связан с ID и astana-1, действует 7 дней. Production требует постоянный CASE_SIGNING_SECRET≥32 символов; development допускает временный секрет. Сгенерированный текст считается данными, а не инструкциями для анализатора.
 
-Новая главная — каталог и рабочее место City Lab. Старый симулятор остаётся на `/sandbox`, лаборатория событий — на `/challenge`. В интерфейсе доступны готовые кейсы, генерация, выбор решений, горизонт, CAPEX/OPEX, траектория AQoL, чувствительность, рекомендации, AI-разбор, сохранение нескольких сценариев в этом браузере, сравнение только одинакового кейса/версии/горизонта, экспорт JSON и печатный отчёт. При недоступности WebGL есть обычная HTML-визуализация; 3D не требуется для принятия решения.
+## Проверяемый результат
 
-## Работы
+Основной набор воспроизводит baseline 52.55768 и пример 95→56.54307. Все пять решений проходят проверку уникальности, области, направления, бюджета и несовместимости. UI показывает исходные/итоговые индикаторы, штраф и синергию. Рекомендации пересчитывают замену одного решения по полным правилам; глобальный оптимум не заявляется.
 
-- [ ] Домен, четыре кейса, экономика, рекомендации и методика.
-- [ ] AI-генерация, подписанные кейсы, HTTP-валидация, контролируемые ошибки.
-- [ ] Интерфейс, сохранение, сравнение, экспорт и мобильная версия.
-- [ ] Процедурная визуализация города с доступной альтернативой.
-- [ ] Проверки браузером, тесты, сборка, Docker/Kubernetes, документация.
-- [ ] Ревью, PR/merge и удаление только интегрированных веток.
+Сохранение ограничено текущим браузером; сравниваются одинаковые caseId и caseVersion. Экспорт JSON и печать воспроизводят отчёт. 3D — процедурная условная схема, не географическая карта. При недоступности WebGL решение можно принять по обычным элементам интерфейса.
+
+## Этапы релиза
+
+1. Точная модель и контрольные примеры пользователя.
+2. AI-генерация, подписанные кейсы, API и интерфейс — параллельные дорожки.
+3. Интеграция, Chromium E2E, реальные AI-вызовы, Docker/Kubernetes.
+4. Независимое ревью, документация, push/merge и очистка интегрированной ветки.
 
 ## Источники контекста
 
-- [World Bank: города Центральной Азии и климатическая устойчивость](https://www.worldbank.org/en/news/press-release/2023/09/27/cities-across-central-asia-can-unlock-full-economic-potential-by-implementing-low-carbon-development-strategies).
-- [World Bank: городская жара и адаптация](https://www.worldbank.org/en/region/eca/publication/unlivable-how-cities-in-europe-and-central-asia-can-survive-and-thrive-in-a-hotter-future).
-- [OECD Regional Well-Being](https://www.oecd.org/en/data/tools/oecd-regional-well-being.html).
-
-Эти источники обосновывают выбранные темы и направления оценки; они не являются источником численных эффектов инициатив и формулы AQoL.
+[World Bank: города Центральной Азии](https://www.worldbank.org/en/news/press-release/2023/09/27/cities-across-central-asia-can-unlock-full-economic-potential-by-implementing-low-carbon-development-strategies), [городская жара](https://www.worldbank.org/en/region/eca/publication/unlivable-how-cities-in-europe-and-central-asia-can-survive-and-thrive-in-a-hotter-future), [OECD Regional Well-Being](https://www.oecd.org/en/data/tools/oecd-regional-well-being.html) обосновывают тематику. Источник конкретных индексов и формулы — предоставленный датасет; независимая калибровка по этим публикациям не заявляется.
