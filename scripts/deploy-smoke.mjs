@@ -49,4 +49,39 @@ assert.ok(Math.abs(result.response.finalAqol - 50.784) < 1e-10);
 assert.equal(result.initial.spent, 100);
 assert.equal(result.response.spent, 85);
 
-process.stdout.write("Deployment smoke passed: health, page, static asset, challenge AQoL and budgets.\n");
+const catalog = await (await request("/api/cases")).json();
+assert.equal(catalog.cases.length, 4);
+const caseDecisions = [
+  { measureId: "M7", districtId: "nura" },
+  { measureId: "M8", districtId: "nura" },
+  { measureId: "M10", districtId: "nura" },
+  { measureId: "M12" },
+  { measureId: "M5", districtId: "saryarka" },
+];
+for (const cityCase of catalog.cases) {
+  assert.equal(cityCase.city.budget, 100);
+  assert.equal(cityCase.city.horizonQuarters, 8);
+  assert.equal(cityCase.city.districts.length, 5);
+  assert.equal(cityCase.city.measures.length, 14);
+  const { evaluation } = await (await request("/api/cases/evaluate", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ caseId: cityCase.id, decisions: caseDecisions }),
+  })).json();
+  assert.equal(evaluation.result.spent, 95);
+  assert.ok(evaluation.result.finalAqol > evaluation.result.baselineAqol);
+  if (cityCase.id === "astana") {
+    assert.ok(Math.abs(evaluation.result.baselineAqol - 52.55768) < 1e-10);
+    assert.ok(Math.abs(evaluation.result.finalAqol - 56.54307) < 1e-10);
+    assert.equal(evaluation.result.criticalCount, 0);
+    assert.equal(evaluation.result.synergies.length, 1);
+  }
+}
+
+const invalid = await fetch(new URL("/api/cases/evaluate", baseUrl), {
+  method: "POST", headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ caseId: "astana", decisions: caseDecisions.slice(1) }),
+  signal: AbortSignal.timeout(30000),
+});
+assert.equal(invalid.status, 400);
+assert.ok(!(await invalid.json()).evaluation);
+process.stdout.write("Deployment smoke passed: health, assets, challenge, four city cases, exact Astana score and invalid-plan rejection.\n");
