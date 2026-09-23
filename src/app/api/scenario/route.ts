@@ -1,6 +1,8 @@
 import { runScenario } from "@/application/run-scenario";
+import { narrateScenario } from "@/application/scenario-narrator";
 import { ScenarioValidationError, type ScenarioErrorCode } from "@/domain/model";
 import { scenarioSchema } from "@/infrastructure/http/scenario-schema";
+import { NvidiaScenarioNarrator } from "@/infrastructure/nvidia-scenario-narrator";
 
 const validationMessages: Record<ScenarioErrorCode, string> = {
   VERSION_MISMATCH: "Версии данных или правил устарели. Обновите страницу.",
@@ -29,7 +31,12 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const result = runScenario(parsed.data);
-    return Response.json({ result });
+    const narrator = new NvidiaScenarioNarrator({
+      apiKey: process.env.NVIDIA_API_KEY,
+      model: process.env.NVIDIA_MODEL,
+    });
+    const narration = await narrateScenario(result, narrator);
+    return Response.json({ result, narration });
   } catch (error) {
     if (error instanceof ScenarioValidationError) {
       return Response.json({ error: validationMessages[error.code] }, { status: 400 });

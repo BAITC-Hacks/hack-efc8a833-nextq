@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { after, test } from "node:test";
 import { directions, type ScenarioInput } from "../../../domain/model";
 import { POST } from "./route";
+
+const originalApiKey = process.env.NVIDIA_API_KEY;
+delete process.env.NVIDIA_API_KEY;
+after(() => {
+  if (originalApiKey === undefined) {
+    delete process.env.NVIDIA_API_KEY;
+  } else {
+    process.env.NVIDIA_API_KEY = originalApiKey;
+  }
+});
 
 function scenario(): ScenarioInput {
   return {
@@ -24,10 +34,39 @@ test("POST returns server-calculated costs and score", async () => {
   input.decisions[0].initiativeId = "bus-priority";
   const response = await POST(request(input));
   assert.equal(response.status, 200);
-  const { result } = await response.json();
+  const { result, narration } = await response.json();
   assert.equal(result.spent, 20);
   assert.equal(result.remaining, 80);
   assert.ok(Math.abs(result.finalAqol - 50.16) < 1e-10);
+  assert.equal(narration.status, "unavailable");
+});
+
+test("POST returns the calculated result and unavailable state after a provider failure", async (context) => {
+  process.env.NVIDIA_API_KEY = "test-key";
+  context.after(() => { delete process.env.NVIDIA_API_KEY; });
+  context.mock.method(globalThis, "fetch", async () => new Response("private-provider-detail", { status: 503 }));
+  const response = await POST(request(scenario()));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.result.finalAqol, 50);
+  assert.equal(body.result.remaining, 100);
+  assert.equal(body.narration.status, "unavailable");
+  assert.ok(!JSON.stringify(body).includes("private-provider-detail"));
+});
+
+test("POST returns validated narration alongside the unchanged computed result", async (context) => {
+  process.env.NVIDIA_API_KEY = "test-key";
+  context.after(() => { delete process.env.NVIDIA_API_KEY; });
+  const content = { summary: "AQoL не изменился.", strengths: [], risks: [], tradeoffs: [] };
+  context.mock.method(globalThis, "fetch", async () => Response.json({
+    choices: [{ message: { content: JSON.stringify(content) }, finish_reason: "stop" }],
+  }));
+  const response = await POST(request(scenario()));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.result.finalAqol, 50);
+  assert.equal(body.result.remaining, 100);
+  assert.deepEqual(body.narration, { status: "ready", content });
 });
 
 test("POST rejects malformed JSON without echoing its contents", async () => {

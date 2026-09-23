@@ -22,7 +22,7 @@ pnpm build
 pnpm start
 ```
 
-Тесты доменной модели и HTTP-границы:
+Тесты доменной модели, HTTP-границы и AI-fallback:
 
 ```sh
 pnpm test
@@ -59,7 +59,11 @@ curl http://localhost:3000/api/scenario \
   -d '{"datasetVersion":"city-1","rulesVersion":"rules-1","decisions":[{"direction":"transport","initiativeId":"keep-transport","districtId":"orken"},{"direction":"green","initiativeId":"keep-green","districtId":"orken"},{"direction":"social","initiativeId":"keep-social","districtId":"orken"},{"direction":"safety","initiativeId":"keep-safety","districtId":"orken"},{"direction":"services","initiativeId":"keep-services","districtId":"orken"}]}'
 ```
 
-Успех: `200` с `{ "result": ... }`, включая расход `0` и AQoL `50`. Некорректный JSON, устаревшие версии, неправильные решения или превышение бюджета: `400` с `{ "error": "..." }`. Неожиданная серверная ошибка: `500` с общим сообщением без внутренних деталей. Zod проверяет форму запроса, домен — правила симуляции; каталог и формула остаются серверным источником расчёта.
+Успех: `200` с `{ "result": ..., "narration": ... }`, включая расход `0` и AQoL `50`. Статус объяснения бывает `ready` или `unavailable`; он не меняет вычисленный результат. Некорректный JSON, устаревшие версии, неправильные решения или превышение бюджета: `400` с `{ "error": "..." }`. Неожиданная серверная ошибка: `500` с общим сообщением без внутренних деталей. Zod проверяет форму запроса, домен — правила симуляции; каталог и формула остаются серверным источником расчёта.
+
+## AI-анализ
+
+Для NVIDIA NIM скопируйте `.env.example` в `.env.local` и задайте `NVIDIA_API_KEY`. `NVIDIA_MODEL` по умолчанию — `nvidia/nemotron-3-nano-30b-a3b`; при необходимости его можно заменить. Ключ читается только сервером и не передаётся в браузер. Без ключа, при таймауте или ошибке провайдера система показывает, что AI-разбор недоступен, и сохраняет детерминированный AQoL. Модель объясняет переданные расчёты и не определяет цены, эффекты или Score.
 
 ## Статус
 
