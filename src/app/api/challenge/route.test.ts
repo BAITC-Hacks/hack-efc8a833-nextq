@@ -40,6 +40,11 @@ function request(body: unknown): Request {
   });
 }
 
+test("POST bounds the legacy challenge request body", async () => {
+  const response = await POST(request({ payload: "x".repeat(32769) }));
+  assert.equal(response.status, 413);
+});
+
 test("POST returns trusted event effects and all three scenario results", async () => {
   const response = await POST(request(challenge()));
 

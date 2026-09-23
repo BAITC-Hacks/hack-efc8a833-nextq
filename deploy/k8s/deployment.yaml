@@ -32,13 +32,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: akim-config
-          env:
-            - name: NVIDIA_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: akim-nvidia
-                  key: NVIDIA_API_KEY
-                  optional: true
+            - secretRef:
+                name: akim-ai
+                optional: true
           startupProbe:
             httpGet:
               path: /api/health

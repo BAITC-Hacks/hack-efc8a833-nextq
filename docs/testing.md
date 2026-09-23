@@ -29,4 +29,16 @@ pnpm build
 pnpm exec tsx --test src/data/city-v1.test.ts
 ```
 
-Workflow `.github/workflows/verify.yml` запускает установку по lockfile, все тесты, ESLint и production-сборку на Node.js 22 при push и pull request.
+Workflow `.github/workflows/verify.yml` запускает установку по lockfile, все тесты, ESLint, production-сборку и Chromium E2E на Node.js 22 при push и pull request. Отдельная задача проверяет Kubernetes и настоящий Docker runtime.
+
+## City Lab
+
+`pnpm test` рекурсивно находит `src/**/*.test.ts` и `src/**/*.test.tsx`; новые тесты не требуют ручного перечисления. Проверяются четыре кейса, бюджет 100, ровно 5мер, максимум 2одногонаправления, несовместимости, лаги и отрицательные эффекты, синергии, порог40, пересчитанные рекомендации, HTTP-схемы, подписи AI-кейсов и провайдеры с подменённым HTTP.
+
+```sh
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+Playwright запускает production-сервер на 3210. Для уже запущенного приложения используйте `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 pnpm test:e2e`. Ошибки сохраняются в `test-results/`, HTML-отчёт — `playwright-report/`; эти каталоги не коммитятся. В CI артефакты неуспешного прогона доступны семь дней. Mock AI в браузерных тестах проверяет пользовательский сценарий и не является доказательством работы настоящего провайдера.
