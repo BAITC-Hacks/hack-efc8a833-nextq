@@ -1,6 +1,11 @@
-import { ScenarioBuilder } from "@/components/simulation/scenario-builder";
-import { cityV1 } from "@/data/city-v1";
+import { CityLab } from "@/components/city-lab/city-lab";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "City Lab — Аким на 5 часов",
+  description: "Пять районов Астаны, четырнадцать мер и бюджет 100. Проверьте последствия пяти решений для города за восемь кварталов.",
+};
 
 export default function Home() {
-  return <ScenarioBuilder city={cityV1} />;
+  return <CityLab />;
 }
