@@ -1,3 +1,5 @@
+import type { ExternalImpact } from "./events";
+
 export const directions = ["transport", "green", "social", "safety", "services"] as const;
 
 export type Direction = (typeof directions)[number];
@@ -63,7 +65,7 @@ export type DistrictResult = {
   quality: number;
 };
 
-export type AppliedImpact = {
+export type AppliedImpact = ExternalImpact | {
   kind: "initiative" | "interaction";
   initiativeIds: string[];
   districtId: string;

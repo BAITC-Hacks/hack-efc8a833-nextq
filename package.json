@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "tsx --test src/data/city-v1.test.ts src/domain/evaluate-scenario.test.ts src/app/api/scenario/route.test.ts src/infrastructure/nvidia-scenario-narrator.test.ts"
+    "test": "tsx --test src/data/city-v1.test.ts src/domain/evaluate-scenario.test.ts src/domain/run-event-challenge.test.ts src/app/api/scenario/route.test.ts src/app/api/challenge/route.test.ts src/infrastructure/nvidia-scenario-narrator.test.ts"
   },
   "dependencies": {
     "lucide-react": "latest",

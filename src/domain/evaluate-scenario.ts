@@ -1,3 +1,4 @@
+import type { ExternalImpact } from "./events";
 import {
   directions,
   ScenarioValidationError,
@@ -60,7 +61,7 @@ function validateDataset(city: CityDataset): void {
   }
 }
 
-export function evaluateScenario(input: ScenarioInput, city: CityDataset): ScenarioResult {
+export function evaluateScenario(input: ScenarioInput, city: CityDataset, externalImpacts: ExternalImpact[] = []): ScenarioResult {
   validateDataset(city);
 
   if (input.datasetVersion !== city.datasetVersion || input.rulesVersion !== city.rulesVersion) {
@@ -119,6 +120,14 @@ export function evaluateScenario(input: ScenarioInput, city: CityDataset): Scena
         rawDeltas: { ...interaction.deltas },
       });
     }
+  }
+
+  for (const impact of externalImpacts) {
+    if (impact.kind !== "event" || !impact.eventId || !city.districts.some((district) => district.id === impact.districtId)) {
+      throw new Error("Событие содержит некорректное воздействие или район.");
+    }
+    validateDeltas(impact.rawDeltas);
+    impacts.push({ ...impact, rawDeltas: { ...impact.rawDeltas } });
   }
 
   const districts = city.districts.map((district) => {
