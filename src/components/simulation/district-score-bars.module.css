@@ -1,0 +1,100 @@
+.section {
+  margin-block: 26px;
+}
+
+.section h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.legend {
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+}
+
+.card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+
+.card h4 {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.indicators {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.indicator dt {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.indicator dd {
+  margin: 4px 0 0;
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.bars {
+  display: grid;
+  gap: 3px;
+  margin-top: 5px;
+}
+
+.track {
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--paper-deep);
+}
+
+.baseline,
+.final {
+  display: block;
+  height: 100%;
+}
+
+.baseline {
+  background: var(--ink-soft);
+}
+
+.final {
+  background: var(--teal);
+}
+
+@media (forced-colors: active) {
+  .baseline,
+  .final {
+    border-top: 5px solid CanvasText;
+  }
+}
