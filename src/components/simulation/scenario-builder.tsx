@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { ArrowRight, Clock3, MapPinned, RotateCcw } from "lucide-react";
 import { directions, type CityDataset, type Direction } from "@/domain/model";
 import { BudgetMeter } from "./budget-meter";
@@ -82,6 +83,7 @@ export function ScenarioBuilder({ city }: { city: CityDataset }) {
         <div className="briefing-copy"><div className="eyebrow"><span>ASTANA / CITY LAB</span><span className="eyebrow-line" /><span>АКИМ НА 5 ЧАСОВ</span></div><h1>Город — это<br /><em>сумма решений.</em></h1><p>Пять направлений. Один общий бюджет. Выберите район и мероприятие для каждого направления, затем оцените последствия.</p><div className="briefing-meta"><span><Clock3 size={15} aria-hidden="true" /> 5 ЭТАПОВ</span><span><MapPinned size={15} aria-hidden="true" /> {city.districts.length} РАЙОНОВ</span></div></div>
         <BudgetMeter budget={city.budget} spent={spent} />
       </section>
+      <nav className="challenge-entry" aria-label="Режим симуляции"><div><strong>Лаборатория устойчивости</strong><p>Городское событие, перераспределение бюджета и три состояния AQoL.</p></div><Link href="/challenge">Проверить план на устойчивость <ArrowRight size={17} aria-hidden="true" /></Link></nav>
       <section className="workspace" aria-label="План заседания">
         <div className="section-heading"><div><div className="eyebrow compact">ПОВЕСТКА ЗАСЕДАНИЯ</div><h2>Пять решений</h2></div><span className="progress-label" aria-live="polite">0{completed} <i>/</i> 05 <small>ПРИНЯТО</small></span></div>
         <div className="decision-layout">
