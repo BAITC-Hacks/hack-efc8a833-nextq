@@ -134,4 +134,6 @@ curl http://localhost:3000/api/cases/evaluate \
 
 Релиз City Lab проверен 23 сентября 2026: **99 unit/integration-тестов, 8 Chromium E2E, lint, production build, Docker и локальный Kubernetes**. Реальные генерация и анализ OpenAI прошли через браузер; NVIDIA проверен mock-тестами. [Протокол проверки](docs/release-verification.md), [демо на три минуты](docs/demo-script.md), [структура презентации](docs/presentation.md).
 
+GitHub Actions пока не запускается из-за блокировки аккаунта организации по биллингу. После восстановления доступа нужно повторить CI; приведённые результаты получены локально.
+
 Иконки — [Lucide](https://lucide.dev/guide/react) (ISC), процедурная сцена — [Three.js](https://threejs.org/) (MIT). Внешние 3D-модели и изображения не загружаются; скриншот получен из работающего приложения.
